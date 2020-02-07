@@ -78,3 +78,31 @@ BORDER_REPLICATE是opecv中值滤波函数medianBlur采用的默认方式。BORD
 （1）对图像的像素值在空间范围上求导，例如prewith和sobel算子（体现一阶导数信息）和laplacian算子（体现二阶导数信息）。
 
 （2）对图像的像素值按照卷积核进行加权平均，例如高斯滤波。
+
+待补充Hog和Sift算法。
+
+## Week3
+
+#### 理论要点：
+
+Linear regression有解析解和数值解。解析解通过最小二乘法，数值解通过梯度下降的方法获得。解析解是完美的全局最优解，但它有两个问题：
+
+（1）不适合海量数据的场景；
+
+（2）不适合非凸的目标函数。实际场景几乎都是非凸的目标函数。
+
+不同属性（特征）的scale差距过大，会使得训练过程中大大偏离局部最优解的方向，从而训练慢。此时应该做归一化，避免该现象。
+
+随机梯度下降：它不同于梯度下降（每次都沿着全部数据代表的全局梯度的方向下降），而通过部分采样的方式引入了随机性。
+
+对于凸的目标函数，参数（权重，偏置）的初始值并不重要，但是它对于非凸的目标函数很重要。
+
+#### 编程实践：
+
+（1）基于numpy完成[线性回归](./week3/linear_regression.py)的完整算法及其可视化。训练过程图如下：
+
+![linear_regression_process](README.assets/linear_regression_process.gif)
+
+（2）基于numpy完成[逻辑回归](./week3/logistic_regression.py)的完整算法及其可视化。训练过程图如下：
+
+![linear_regression_process](README.assets/logistic_regression_process.gif)

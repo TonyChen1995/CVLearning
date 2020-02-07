@@ -1,23 +1,25 @@
 # -*- coding: utf-8 -*-
 """
-This module implements the linear regression algorithm and a visualized training demo.
+This module implements the linear logistic algorithm and a visualized training demo.
 In the algorithm, the feature x can be a vector, while the label y is continuous scalar.
 It is highly recommended run the demo in a IDE(e.g. Spyder).
 However, in order to run the demo, you can also type:
     $ python linear_regression.py
-
 """
 import numpy as np
-from numpy import random
+import pandas as pd
 import matplotlib.pyplot as plt
 
-class LinearRegression():
+def sigmoid(x):
+        return 1 / (1 + np.exp(-x))
+
+class LogisticRegression():
     """
-    The Class simply implements the linear regression algorithm.
+    The Class simply implements the logistic regression algorithm.
 
     Note:
         Feature x can be mult-dim, with shape (dim, nums).
-        Target y is a discrete scalar(value can only be 0 or 1), with shape (nums, ).
+        Target y is a continuous scalar, with shape (nums, ).
 
     Attributes:
         dim (int): Dimension of feature.
@@ -29,7 +31,7 @@ class LinearRegression():
         plot_count(int): Number of plots, only used when the plots are saved.
 
     """
-    def __init__(self, dim=1, lr=0.00002, batch_size=50, max_iter=40):
+    def __init__(self, dim=2, lr=0.00018, batch_size=2500, max_iter=70):
 
         self.dim = dim
         self.lr = lr
@@ -43,7 +45,7 @@ class LinearRegression():
 
     def infer(self, x_batch):
 
-        return np.matmul(self.w, x_batch) + self.b
+        return sigmoid(np.matmul(self.w, x_batch) + self.b)
 
     def cal_gradient(self, x_batch, gt_y_batch):
 
@@ -57,42 +59,53 @@ class LinearRegression():
     def eval_loss(self, x_batch, gt_y_batch):
 
         pred_y_batch = self.infer(x_batch)
+        return -np.sum(gt_y_batch*np.log(pred_y_batch)
+                       + (1-gt_y_batch)*np.log(1-pred_y_batch)) / self.batch_size
 
-        return 0.5 * np.sum((pred_y_batch - gt_y_batch)**2) / self.batch_size
-
-    def dynamic_plot(self, x_total, gt_y_total, save=False):
-
-        # this function can only plot 1-dim data
+    def dynamic_plot(self, x_total, gt_y_total, save_plot=False):
+        
+        # this function can only used for the dataset in heights_weights.cvs!
+        
         dim, _ = x_total.shape
-        assert dim == 1, "the dim of a single feature must be 1 in order to plot!"
-
+        assert dim == 2, "the dim of a single feature must be 2 in order to plot!"
+        
         plt.figure(figsize=(8, 6), dpi=80) # generate canvas
         plt.ion() # open interactive mode
         plt.cla() # clear orignal picture
-        plt.title("The Fitting Process of Linear Regression") # set title
+        plt.title("The Fitting Process of Logistic Regression") # set title
         plt.grid(True) # open grid line
-        plt.xlabel("x") # set x label name
-        plt.ylabel("y") # set y label name
+        plt.xlabel("Height (inches)") # set x label name
+        plt.ylabel("Weight (pounds)") # set y label name
 
         # plot
-        plt.scatter(x_total, gt_y_total, label='Ground Truth')
-        plt.plot(x_total.flatten(), self.infer(x_total), 'r', label='Predict')
+        #colors = get_color_label(gt_y_total)
+        x_total = x_total.T
+        plt.scatter(x_total[:, 0][:5000], x_total[:, 1][:5000], 
+                    color="blue", label="Male")
+        plt.scatter(x_total[:, 0][5000:], x_total[:, 1][5000:], 
+                    color="green", label="Female")
+
+        x0 = np.linspace(50, 85, num=120)
+        x1 = - (self.w[0] * x0 + self.b) / self.w[1]
+
+        plt.plot(x0, x1, 'r', label="Decision Boundary")
         plt.legend(loc="upper left", shadow=True) # set legend
 
-        if save:
+        if save_plot:
             plt.savefig(str(self.plot_count) + ".png")
             self.plot_count += 1
 
-        plt.pause(0.3)
+        plt.pause(0.1)
 
-    def train(self, x_total, gt_y_total, dynamic_plot=True):
+    def train(self, x_total, gt_y_total, dynamic_plot=True, save_plot=False):
 
         dim, num_total = x_total.shape
         assert dim == self.dim, "the dim of x_total is not %d!\n" % self.dim
 
         for i in range(self.max_iter):
+
             if dynamic_plot:
-                self.dynamic_plot(x_total, gt_y_total)
+                self.dynamic_plot(x_total, gt_y_total, save_plot=save_plot)
 
             batch_idxs = np.random.choice(num_total, self.batch_size)
             x_batch = np.stack([x_total[:, j] for j in batch_idxs], axis=-1)
@@ -106,25 +119,27 @@ class LinearRegression():
 
         plt.ioff()
 
-def gen_sample_data(dim=1, num_total=200):
+def preprocess(array):
+    array[array == "Male"] = 1
+    array[array == "Female"] = 0
+    return array
 
-    # give w and b certain value
-    w = np.ones((dim, ))
-    b = 10.5
+def get_color_label(gt_y_total):
 
-    x_total = np.arange(num_total).reshape(1, num_total)
-    gt_y_total = random.normal(np.matmul(w, x_total) + b, scale=10)
-    return x_total, gt_y_total
+    return ['blue' if gt_y == 1 else 'green' for gt_y in gt_y_total]
 
 def demo():
     """
-    A visualized training process demo of linear regression.
+    A visualized training process demo of logistic regression.
     It is highly recommended run the demo in a IDE(e.g. Spyder).
     """
-    x_total, gt_y_total = gen_sample_data(num_total=200) # generate training data
+    df = pd.read_csv("./heights_weights.csv")
 
-    solver = LinearRegression(dim=1, lr=0.00002, batch_size=50, max_iter=40)
-    solver.train(x_total, gt_y_total)
+    x_total = df.iloc[:, 1:3].values
+    gt_y_total = preprocess(df.iloc[:, 0].values.flatten())
+
+    solver = LogisticRegression(dim=2, lr=0.00018, batch_size=2500, max_iter=65)
+    solver.train(x_total.T, gt_y_total, save_plot=True)
 
 if __name__ == "__main__":
     demo()
