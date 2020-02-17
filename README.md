@@ -38,10 +38,6 @@
 
 ![image-20200201213300378](README.assets/image-20200201213300378.png)
 
-改为绿色背景：
-
-![image-20200201213409112](README.assets/image-20200201213409112.png)
-
 改为红色背景：
 
 ![image-20200201213446676](README.assets/image-20200201213446676.png)
@@ -99,10 +95,47 @@ Linear regression有解析解和数值解。解析解通过最小二乘法，数
 
 #### 编程实践：
 
-（1）基于numpy完成[线性回归](./week3/linear_regression.py)的完整算法及其可视化。训练过程图如下：
+（1）基于numpy的[线性回归](./week3/linear_regression.py)算法及其可视化。训练动态图如下：
 
 ![linear_regression_process](README.assets/linear_regression_process.gif)
 
-（2）基于numpy完成[逻辑回归](./week3/logistic_regression.py)的完整算法及其可视化。训练过程图如下：
+（2）基于numpy的[逻辑回归](./week3/logistic_regression.py)算法及其可视化。训练动态图如下：
 
-![linear_regression_process](README.assets/logistic_regression_process.gif)
+![logistic_regression_process](README.assets/logistic_regression_process.gif)
+
+## week5
+
+#### 理论要点
+
+（1）SVM是基于最大化最小间隔的原则进行分类。二分类的SVM的label分成两类-1，和+1，但是logistic回归的label两类却是0和1。实际上，两者（线性可分的svm）的决策边界都是wx+b=0，但是logistic回归将其取了个sigmoid，映射成0~1（因此具有概率含义）。
+
+经过数学推导，线性可分的svm最终变成了有不等式约束条件下的最优化问题（机器学习问题的数学形式其实就是最优化问题），最优化的是使得权重w的模最小。但实际的数据肯定不是线性可分的，因此引入了软间隔和核函数。
+
+SVM并不适合大量数据，因为它的计算时间复杂度大（O(N^2))，而且要读入全部样本，很消耗内存。但是logistic回归可以，因为它能够用梯度下降的方法来优化。
+
+（2）softmax可以理解为一种激活函数，和sigmoid/relu等单输入单输出不同的是，它的输入有多个。它会使得小的更小，大的更大（指相对比例）。例如softmax([2, 3, 4]) = [0.09, 0.24, 0.69]；另外，直接用公式算softmax的话，很有可能会溢出（numpy会输出inf，再做运算会变成nan）。
+
+（3）kmeans的主要问题包括：k值的选择和容易陷入不好的局部最优解。
+
+k值的选择是一个超参数，一种常见的方式是Elbow method。即通过取一系列的k值，然后人工评估不同k值的WSS(每一簇样本与其聚类中心的平方和的总和)，然后人为地找出拐点，YoloV3就是这么做的。但是拐点的判断是比较主观的。也有程序自动调整k值的算法，例如ISODATA。
+
+kmeans不是全局最优解，而且它容易陷入不好的局部最优解。例如，有四个样本点，坐标为(0, 0), (2, 0), (0, 1)和(2, 1)。现在要聚成两类，如果初始的聚类中心是(1, 0), (1,1)，那么就直接收敛了，但实际上(0, 0.5)和(2, 0.5)才是最优解。从上面可以看出，找到一个好的局部最优解和初始值密切相关。
+
+一种解决方式是多次尝试不同的初始聚类中心。sklearn库的kmeans的构造函数专门有一个入参n_init，用来配置多个不同随机种子下的初始聚类中心，然后选择其中指标最好的一组聚类中心。
+
+另一个解决方式是改善初始化方法，代表算法为kmeans++。原生的kmeans算法的初始选择十分简单，就是直接在样本中随机选择k个点作为初始的聚类中心。但是这样很有可能选择的聚类中心彼此距离很近，这和类间远距离，类内近距离的聚类思想不符，而kmeans++正是改善（也仅仅改善）了这一点。
+
+kmeans++的初始化方法步骤为：
+
+1. 按照均匀分布，从数据点x选择一个点作为第一个聚类中心；
+2. 对于每一个数据点x，计算D(x)，即它到最近的已经选出来的聚类中心的距离；
+3. 根据D(x)^2的概率分布，随机选择出下一个数据点作为聚类中心。这意味着，D(x)越大的数据点越容易被选中；
+4. 重复步骤2和步骤3，直到选出k个聚类中心为止。
+
+#### 编程实践
+
+基于numpy的[kmeans++](./week5/kmeans_plus_plus.py)算法与可视化。训练动态图如下：
+
+![kmeans_plus_plus_fit_process](./week5/kmeans_plus_plus_fit_process.gif)
+
+其中的数据是人为造的，具有明显的聚类结构。可见kmeans++对于这种结构化数据，收敛得很快。

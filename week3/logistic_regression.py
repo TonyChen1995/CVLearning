@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-This module implements the linear logistic algorithm and a visualized training demo.
-In the algorithm, the feature x can be a vector, while the label y is continuous scalar.
+This module implements the logistic algorithm and a visualized training demo.
+In the algorithm, a single data sample x can be a vector, while the label y can only be 0 or 1.
 It is highly recommended run the demo in a IDE(e.g. Spyder).
-However, in order to run the demo, you can also type:
-    $ python linear_regression.py
+You can also juts type following command to run the visualized demo:
+    $ python logistic_regression.py
 """
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
 def sigmoid(x):
-        return 1 / (1 + np.exp(-x))
+    return 1 / (1 + np.exp(-x))
 
 class LogisticRegression():
     """

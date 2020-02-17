@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 This module implements the linear regression algorithm and a visualized training demo.
-In the algorithm, the feature x can be a vector, while the label y is continuous scalar.
+In the algorithm, a single data sample x can be a vector, while the label y is continuous scalar.
 It is highly recommended run the demo in a IDE(e.g. Spyder).
-However, in order to run the demo, you can also type:
+You can also juts type following command to run the visualized demo:
     $ python linear_regression.py
-
 """
 import numpy as np
 from numpy import random
