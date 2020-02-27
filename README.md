@@ -73,7 +73,7 @@ BORDER_REPLICATE是opecv中值滤波函数medianBlur采用的默认方式。BORD
 
 （2）对图像的像素值按照卷积核进行加权平均，例如高斯滤波。
 
-待补充Hog和Sift算法。
+待补充Hog算法。
 
 #### 编程实践
 
@@ -111,25 +111,21 @@ Linear regression有解析解和数值解。解析解通过最小二乘法，数
 
 #### 理论要点
 
-待补充。
+待补充SIFT算法。
 
-#### 编程实践
+#### 编程实践（Project 1)
 
-关于OpenCV中的SIFT模块的安装：
+基于OpenCV实现了[图像拼接](./week4/image_stitching.py)。拼接的两张原图为：
 
-仅仅安装了opencv-python是不够的，还需要安装opencv-contrib-python模块，而且它不能是太高的版本（因为高版本由于版权问题没有SIFT了）。推荐用pip来安装，命令为：
+![image-20200228002202788](README.assets/image-20200228002202788.png)
 
-```bash
-pip install opencv-contrib-python==3.4.2.16
-```
+匹配点为：
 
-注意在国内也需要像配置conda源一样，[配置pip的镜像源](https://blog.csdn.net/Sagepyt/article/details/100740862)。
+![image-20200228002331725](README.assets/image-20200228002331725.png)
 
-安装完成后，在Anaconda Prompt中输入conda list opencv可以看到有opencv和opencv-contrib-python两个模块：
+拼接合成图：
 
-![image-20200223180001631](README.assets/image-20200223180001631.png)
-
-在Anaconda Prompt下输入python -c "import cv2; cv2.xfeatures2d.SIFT_create()"，运行无报错则表明安装成功。
+![image-20200228002431082](README.assets/image-20200228002431082.png)
 
 ## week5
 
